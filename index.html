@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Employee Services</title>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.0/angular.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="all-wrapper">
+        <header>
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <ul class="nav nav-tabs">
+                            <li><a href="void()" data-toggle="tab" class="active">Employee Directory</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div ng-app="Employee" ng-controller="addEmployee" class="container mt-30">
+            <div class="tab-content">
+                <div id="employee" class="tab-pane fade in active show">
+                    <form ng-submit="addOrEditEmployeeData(employee_id)">
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="name">Name : </label>
+                                    <input type="text" ng-change="getAge()" required class="form-control"
+                                        ng-model="name" id="name">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="email">Email Id :</label>
+                                    <input type="email" ng-change="getAge()" required class="form-control"
+                                        ng-model="email" id="email">
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="DOB">DOB :</label>
+                                    <input type="date" ng-change="getAge()" required class="form-control" ng-model="DOB"
+                                        id="DOB">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="department">Department : </label>
+                                    <input type="text" required ng-change="getAge()" class="form-control"
+                                        ng-model="department" id="department">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="gender">Gender : </label>
+                                    <input type="text" required ng-change="getAge()" class="form-control"
+                                        ng-model="gender" id="gender">
+                                </div>
+                            </div>
+                            <div class="col-1">
+                                <div class="form-group">
+                                    <label for="age">Age (Y): </label>
+                                    <input type="text" readonly class="form-control" ng-model="age" id="age">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 button-div">
+                                    &nbsp; &nbsp;&nbsp;&nbsp;<button type="submit"
+                                        class=" btn btn-primary mr-15">{{submitButtonName}}</button>
+                                    <button type="reset" class="btn btn-secondary">Reset</button>
+                                </div>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div ng-app="Employee" ng-controller="showEmployees" class="container mt-50">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Sr. No.</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">DOB</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Edit</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="employee in employeeList">
+                        <th scope="row">{{$index+1}}</th>
+                        <td>{{employee.name}}</td>
+                        <td>{{employee.email}}</td>
+                        <td>{{employee.DOB | date :  "dd-MM-y"}}</td>
+                        <td>{{employee.department}}</td>
+                        <td>{{employee.gender}}</td>
+                        <td><button type="submit" ng-click="editEmployee(employee._id)" class=" btn btn-primary mr-15">
+                                &nbsp;/&nbsp; </button></td>
+                        <td><button type="submit" ng-click="deleteEmployee(employee._id)"
+                                class=" btn btn-primary mr-15"> &nbsp;-&nbsp; </button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        var employee = angular.module('Employee', []);
+
+        employee.controller('showEmployees', function ($scope, $http) {
+            $http.get("http://localhost:8000/employees").then(function (response) {
+                $scope.employeeList = response.data.data
+            });
+        });
+
+        employee.controller('addEmployee', function ($scope, $window, $http) {
+            $scope.DOB = new Date('01-01-1990')
+            $scope.submitButtonName = "Add Employee"
+            $scope.employee_id = id = null
+            var employeeData = {}
+            $scope.addOrEditEmployeeData = function (id) {
+                employeeData["name"] = $scope.name
+                employeeData["email"] = $scope.email
+                employeeData["DOB"] = $scope.DOB
+                employeeData["department"] = $scope.department
+                employeeData["gender"] = $scope.gender
+
+                if (id) {
+                    employeeData["_id"] = id
+                    $http({
+                        url: 'http://localhost:8000/updateEmployee/' + id,
+                        method: "POST",
+                        data: employeeData
+                    }).then(function (response) {
+                        if (response.data.code == 0) {
+                            alert("Data modified successfully")
+                            $window.location.reload();
+                        } else {
+                            alert("Error : Someting went worong, please try again later.")
+                        }
+                    })
+                } else {
+                    $http({
+                        url: 'http://localhost:8000/addEmployee',
+                        method: "POST",
+                        data: employeeData
+                    }).then(function (response) {
+                        if (response.data.code == 0) {
+                            alert("Data added successfully")
+                            $window.location.reload();
+                        } else {
+                            alert("Error : Someting went worong, please try again later.")
+                        }
+                    })
+                }
+
+
+            }
+            $scope.getAge = function () {
+                $scope.age = dateDiffInYears($scope.DOB)
+            }
+            $scope.deleteEmployee = function (id) {
+                $http.get("http://localhost:8000/deleteEmployee/" + id).then(function (response) {
+                    if (response.data.code == 0) {
+                        alert("Data deleted successfully")
+                        $window.location.reload();
+                    } else {
+                        alert("Error : Someting went worong, please try again later.")
+                    }
+                });
+            }
+            $scope.editEmployee = function (id) {
+                $http.get("http://localhost:8000/getEmployee/" + id).then(function (response) {
+                    $scope.employee_id = id
+                    $scope.name = response.data.data.name
+                    $scope.email = response.data.data.email
+                    $scope.DOB = new Date(response.data.data.DOB)
+                    $scope.department = response.data.data.department
+                    $scope.gender = response.data.data.gender
+                    $scope.submitButtonName = "Modify"
+                });
+            }
+        });
+
+        function dateDiffInYears(dateold) {
+            var datenew = new Date()
+            var ynew = datenew.getFullYear();
+            var mnew = datenew.getMonth();
+            var dnew = datenew.getDate();
+            var yold = dateold.getFullYear();
+            var mold = dateold.getMonth();
+            var dold = dateold.getDate();
+            var diff = ynew - yold;
+            if (mold > mnew) diff--;
+            else {
+                if (mold == mnew) {
+                    if (dold > dnew) diff--;
+                }
+            }
+            return diff;
+        }
+
+        function IsFormValid() {
+            var name = document.getElementById("name");
+            var email = document.getElementById("email");
+            var DOB = document.getElementById("DOB");
+            var department = document.getElementById("department");
+            var gender = document.getElementById("gender");
+            var age = document.getElementById("age");
+
+            if (name.checkValidity() && email.checkValidity() && DOB.checkValidity() && department.checkValidity() && gender.checkValidity()) {
+                return true
+                //alert("Employee Added Successfully");
+            } else {
+                return false
+                // document.getElementById("employee").innerHTML = inpObj.validationMessage;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
