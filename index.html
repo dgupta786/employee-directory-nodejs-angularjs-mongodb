@@ -119,7 +119,7 @@
         var employee = angular.module('Employee', []);
 
         employee.controller('showEmployees', function ($scope, $http) {
-            $http.get("http://localhost:8000/employees").then(function (response) {
+            $http.get("https://employee-directory-dgupta.herokuapp.com/employees").then(function (response) {
                 $scope.employeeList = response.data.data
             });
         });
@@ -139,7 +139,7 @@
                 if (id) {
                     employeeData["_id"] = id
                     $http({
-                        url: 'http://localhost:8000/updateEmployee/' + id,
+                        url: 'https://employee-directory-dgupta.herokuapp.com/updateEmployee/' + id,
                         method: "POST",
                         data: employeeData
                     }).then(function (response) {
@@ -152,7 +152,7 @@
                     })
                 } else {
                     $http({
-                        url: 'http://localhost:8000/addEmployee',
+                        url: 'https://employee-directory-dgupta.herokuapp.com/addEmployee',
                         method: "POST",
                         data: employeeData
                     }).then(function (response) {
@@ -171,7 +171,7 @@
                 $scope.age = dateDiffInYears($scope.DOB)
             }
             $scope.deleteEmployee = function (id) {
-                $http.get("http://localhost:8000/deleteEmployee/" + id).then(function (response) {
+                $http.get("https://employee-directory-dgupta.herokuapp.com/deleteEmployee/" + id).then(function (response) {
                     if (response.data.code == 0) {
                         alert("Data deleted successfully")
                         $window.location.reload();
@@ -181,7 +181,7 @@
                 });
             }
             $scope.editEmployee = function (id) {
-                $http.get("http://localhost:8000/getEmployee/" + id).then(function (response) {
+                $http.get("https://employee-directory-dgupta.herokuapp.com/getEmployee/" + id).then(function (response) {
                     $scope.employee_id = id
                     $scope.name = response.data.data.name
                     $scope.email = response.data.data.email
