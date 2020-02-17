@@ -5,8 +5,6 @@ var dbURI = process.env.DB_STRING || 'mongodb://<username>:<password>@ds019698.m
 
 //var dbURI = 'mongodb://127.0.0.1:27017/mongodb'
 
-//mongo ds019698.mlab.com:19698/employee_directory -u DeepakGupta -p abcd@12345
-
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 mongoose.connection.on('connected', function () {
